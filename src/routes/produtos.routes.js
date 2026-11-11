@@ -5,7 +5,7 @@ const router = Router();
 
 router.get('/', async (req, res) => {
   try {
-    const [rows] = await pool.query('SELECT * FROM consumo');
+    const [rows] = await pool.query('SELECT * FROM produto');
     return res.json(rows);
   } catch (error) {
     return res.status(500).json({ error: error.message });
@@ -15,8 +15,8 @@ router.get('/', async (req, res) => {
 router.get('/:id', async (req, res) => {
   try {
     const { id } = req.params;
-    const [rows] = await pool.query('SELECT * FROM consumo WHERE id_consumo = ?', [id]);
-    if (rows.length === 0) return res.status(404).json({ error: 'Consumo não encontrado.' });
+    const [rows] = await pool.query('SELECT * FROM produto WHERE id_produto = ?', [id]);
+    if (rows.length === 0) return res.status(404).json({ error: 'Produto não encontrado.' });
     return res.json(rows[0]);
   } catch (error) {
     return res.status(500).json({ error: error.message });
@@ -25,10 +25,10 @@ router.get('/:id', async (req, res) => {
 
 router.post('/', async (req, res) => {
   try {
-    const { id_consumo, reserva_id, produto_id, quantidade, subtotal, status } = req.body;
-    const query = 'INSERT INTO consumo (id_consumo, reserva_id, produto_id, quantidade, subtotal, status) VALUES (?, ?, ?, ?, ?, ?)';
-    await pool.query(query, [id_consumo, reserva_id, produto_id, quantidade, subtotal, status || 'SOLICITADO']);
-    return res.status(201).json({ message: 'Consumo registrado com sucesso!' });
+    const { id_produto, nome, preco, estoque, categoria } = req.body;
+    const query = 'INSERT INTO produto (id_produto, nome, preco, estoque, categoria) VALUES (?, ?, ?, ?, ?)';
+    await pool.query(query, [id_produto, nome, preco, estoque, categoria]);
+    return res.status(201).json({ message: 'Produto cadastrado com sucesso!' });
   } catch (error) {
     return res.status(400).json({ error: error.message });
   }
@@ -37,10 +37,10 @@ router.post('/', async (req, res) => {
 router.put('/:id', async (req, res) => {
   try {
     const { id } = req.params;
-    const { reserva_id, produto_id, quantidade, subtotal, status } = req.body;
-    const query = 'UPDATE consumo SET reserva_id = ?, produto_id = ?, quantidade = ?, subtotal = ?, status = ? WHERE id_consumo = ?';
-    await pool.query(query, [reserva_id, produto_id, quantidade, subtotal, status, id]);
-    return res.json({ message: 'Consumo atualizado com sucesso!' });
+    const { nome, preco, estoque, categoria } = req.body;
+    const query = 'UPDATE produto SET nome = ?, preco = ?, estoque = ?, categoria = ? WHERE id_produto = ?';
+    await pool.query(query, [nome, preco, estoque, categoria, id]);
+    return res.json({ message: 'Produto atualizado com sucesso!' });
   } catch (error) {
     return res.status(400).json({ error: error.message });
   }
@@ -49,7 +49,7 @@ router.put('/:id', async (req, res) => {
 router.delete('/:id', async (req, res) => {
   try {
     const { id } = req.params;
-    await pool.query('DELETE FROM consumo WHERE id_consumo = ?', [id]);
+    await pool.query('DELETE FROM produto WHERE id_produto = ?', [id]);
     return res.status(204).send();
   } catch (error) {
     return res.status(400).json({ error: error.message });
